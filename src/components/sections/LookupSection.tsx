@@ -87,7 +87,7 @@ export function LookupSection() {
 
         <div className="flex gap-3 items-stretch">
           <div className="relative flex-1">
-            <Search size={18} color="#6B7280" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
+            <Search size={18} color="#6B7280" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" , zIndex: 10}} />
             <input
               type="text"
               value={query}

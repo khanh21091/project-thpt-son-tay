@@ -1,22 +1,39 @@
-.next/
+# Dependencies
 node_modules/
 
-# Logs
+# Next.js
+.next/
+out/
+
+# Build / cache
+*.tsbuildinfo
+
+# Env (giữ .env.example)
+.env
+.env*.local
+
+# Debug / logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
+.pnpm-debug.log*
 
-# Env files
-.env
-.env.*
-
-# OS / editor
+# OS
 .DS_Store
 Thumbs.db
-.vscode/
-.idea/
 
-# Cursor
+# IDE / Cursor
 .cursor/
+.idea/
+.vscode/
+*.swp
+*.swo
 
+# Vercel
+.vercel
+
+# Testing
+coverage/
+
+# Misc
+*.pem
