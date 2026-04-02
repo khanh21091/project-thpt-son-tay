@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Calendar, CheckCircle, ChevronDown, CreditCard, MapPin, Phone, School, Sparkles, User } from "lucide-react";
 
+import { PaymentConfirmationModal } from "./PaymentConfirmationModal";
+
 const specialSubjects = ["Toán", "Vật Lý", "Hóa Học", "Sinh Học", "Tin Học", "Ngữ Văn", "Lịch Sử", "Địa Lý", "Tiếng Anh"];
 
 const mockExamLocations = [
@@ -58,6 +60,7 @@ export function RegistrationForm() {
     examLocationId: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [locationOpen, setLocationOpen] = useState(false);
   const locationWrapRef = useRef<HTMLDivElement | null>(null);
@@ -106,7 +109,7 @@ export function RegistrationForm() {
       return;
     }
     setErrors({});
-    setSubmitted(true);
+    setPaymentModalOpen(true);
   };
 
   const inputStyle: React.CSSProperties = {
@@ -157,6 +160,7 @@ export function RegistrationForm() {
           <button
             onClick={() => {
               setSubmitted(false);
+              setPaymentModalOpen(false);
               setForm({ fullName: "", cccd: "", dob: "", address: "", school: "", phone: "", subject: "", examLocationId: "" });
             }}
             style={{
@@ -180,6 +184,11 @@ export function RegistrationForm() {
 
   return (
     <section id="dang-ky" className="py-20 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: "#F0F7FF" }}>
+      <PaymentConfirmationModal
+        open={paymentModalOpen}
+        onOpenChange={setPaymentModalOpen}
+        onConfirmTransferred={() => setSubmitted(true)}
+      />
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full" style={{ backgroundColor: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.25)" }}>
