@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Calendar, CheckCircle, ChevronDown, MapPin, Phone, School, Sparkles, User } from "lucide-react";
+import { Calendar, CheckCircle, ChevronDown, CreditCard, MapPin, Phone, School, Sparkles, User } from "lucide-react";
 
 const specialSubjects = ["Toán", "Vật Lý", "Hóa Học", "Sinh Học", "Tin Học", "Ngữ Văn", "Lịch Sử", "Địa Lý", "Tiếng Anh"];
 
@@ -15,6 +15,7 @@ const mockExamLocations = [
 
 interface FormData {
   fullName: string;
+  cccd: string;
   dob: string;
   address: string;
   school: string;
@@ -48,6 +49,7 @@ function FieldWrapper({
 export function RegistrationForm() {
   const [form, setForm] = useState<FormData>({
     fullName: "",
+    cccd: "",
     dob: "",
     address: "",
     school: "",
@@ -68,6 +70,9 @@ export function RegistrationForm() {
   const validate = () => {
     const newErrors: Partial<FormData> = {};
     if (!form.fullName.trim()) newErrors.fullName = "Vui lòng nhập họ và tên";
+    const cccdDigits = form.cccd.replace(/\s/g, "");
+    if (!cccdDigits) newErrors.cccd = "Vui lòng nhập số CCCD";
+    else if (!/^\d{12}$/.test(cccdDigits)) newErrors.cccd = "CCCD phải gồm đúng 12 chữ số";
     if (!form.dob) newErrors.dob = "Vui lòng nhập ngày sinh";
     if (!form.school.trim()) newErrors.school = "Vui lòng nhập tên trường";
     if (!form.phone.trim()) newErrors.phone = "Số điện thoại phụ huynh là bắt buộc";
@@ -147,18 +152,12 @@ export function RegistrationForm() {
           </div>
           <h3 style={{ color: "#1A2B4C", fontWeight: 700, fontSize: 22, marginBottom: 8 }}>Đăng ký thành công!</h3>
           <p style={{ color: "#64748B", fontWeight: 400, fontSize: 15, lineHeight: 1.7, marginBottom: 20 }}>
-            Cảm ơn <strong>{form.fullName}</strong> đã đăng ký. Thông tin sẽ được gửi đến <strong>{form.phone}</strong> sau khi xác nhận.
+            Cảm ơn <strong>{form.fullName}</strong> đã đăng ký. Thông tin thanh toán đã được gửi đến <strong>{form.phone} </strong>. Vui lòng thực hiện thanh toán để hoàn tất đăng ký thi.
           </p>
-          <div className="flex items-center justify-center gap-2 rounded-xl p-4" style={{ backgroundColor: "rgba(37,99,235,0.06)" }}>
-            <Sparkles size={16} color="#2563EB" />
-            <p style={{ color: "#2563EB", fontWeight: 600, fontSize: 14 }}>
-              Bạn đã sẵn sàng cho thử thách môn <span style={{ color: "#F97316" }}>{form.subject}</span>!
-            </p>
-          </div>
           <button
             onClick={() => {
               setSubmitted(false);
-              setForm({ fullName: "", dob: "", address: "", school: "", phone: "", subject: "", examLocationId: "" });
+              setForm({ fullName: "", cccd: "", dob: "", address: "", school: "", phone: "", subject: "", examLocationId: "" });
             }}
             style={{
               marginTop: 20,
@@ -199,29 +198,59 @@ export function RegistrationForm() {
           style={{ boxShadow: "0 8px 40px rgba(26,43,76,0.1)", border: "1px solid #E2E8F0" }}
         >
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <div>
-              <label style={labelStyle}>
-                Họ và tên thí sinh <span style={{ color: "#DC2626" }}>*</span>
-              </label>
-              <FieldWrapper icon={<User size={16} color="#9CA3AF" />} error={errors.fullName} errorStyle={errorStyle}>
-                <input
-                  type="text"
-                  style={{ ...inputStyle, borderColor: errors.fullName ? "#DC2626" : "#E2E8F0" }}
-                  placeholder="Nguyễn Văn A"
-                  value={form.fullName}
-                  onChange={(e) => {
-                    setForm({ ...form, fullName: e.target.value });
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#2563EB";
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = errors.fullName ? "#DC2626" : "#E2E8F0";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                />
-              </FieldWrapper>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label style={labelStyle}>
+                  Họ và tên thí sinh <span style={{ color: "#DC2626" }}>*</span>
+                </label>
+                <FieldWrapper icon={<User size={16} color="#9CA3AF" />} error={errors.fullName} errorStyle={errorStyle}>
+                  <input
+                    type="text"
+                    style={{ ...inputStyle, borderColor: errors.fullName ? "#DC2626" : "#E2E8F0" }}
+                    placeholder="Nguyễn Văn A"
+                    value={form.fullName}
+                    onChange={(e) => {
+                      setForm({ ...form, fullName: e.target.value });
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "#2563EB";
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.1)";
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = errors.fullName ? "#DC2626" : "#E2E8F0";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  />
+                </FieldWrapper>
+              </div>
+              <div>
+                <label style={labelStyle}>
+                  Số CCCD <span style={{ color: "#DC2626" }}>*</span>
+                </label>
+                <FieldWrapper icon={<CreditCard size={16} color="#9CA3AF" />} error={errors.cccd} errorStyle={errorStyle}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={12}
+                    style={{ ...inputStyle, borderColor: errors.cccd ? "#DC2626" : "#E2E8F0" }}
+                    placeholder="12 chữ số trên CCCD"
+                    value={form.cccd}
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/\D/g, "").slice(0, 12);
+                      setForm({ ...form, cccd: v });
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "#2563EB";
+                      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.1)";
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = errors.cccd ? "#DC2626" : "#E2E8F0";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  />
+                </FieldWrapper>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -269,6 +298,53 @@ export function RegistrationForm() {
                   />
                 </FieldWrapper>
               </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>Địa chỉ</label>
+              <div style={{ position: "relative" }}>
+                <div style={{ position: "absolute", left: 12, top: 13, zIndex: 1, pointerEvents: "none" }}>
+                  <MapPin size={16} color="#9CA3AF" />
+                </div>
+                <input
+                  type="text"
+                  style={inputStyle}
+                  placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#2563EB";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#E2E8F0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={labelStyle}>
+                Trường THCS đang học <span style={{ color: "#DC2626" }}>*</span>
+              </label>
+              <FieldWrapper icon={<School size={16} color="#9CA3AF" />} error={errors.school} errorStyle={errorStyle}>
+                <input
+                  type="text"
+                  style={{ ...inputStyle, borderColor: errors.school ? "#DC2626" : "#E2E8F0" }}
+                  placeholder="Trường THCS ..."
+                  value={form.school}
+                  onChange={(e) => setForm({ ...form, school: e.target.value })}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#2563EB";
+                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = errors.school ? "#DC2626" : "#E2E8F0";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                />
+              </FieldWrapper>
             </div>
 
             <div ref={locationWrapRef} style={{ position: "relative", zIndex: 20 }}>
@@ -383,54 +459,6 @@ export function RegistrationForm() {
                 )}
               </AnimatePresence>
             </div>
-
-            <div>
-              <label style={labelStyle}>Địa chỉ</label>
-              <div style={{ position: "relative" }}>
-                <div style={{ position: "absolute", left: 12, top: 13, zIndex: 1, pointerEvents: "none" }}>
-                  <MapPin size={16} color="#9CA3AF" />
-                </div>
-                <input
-                  type="text"
-                  style={inputStyle}
-                  placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
-                  value={form.address}
-                  onChange={(e) => setForm({ ...form, address: e.target.value })}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#2563EB";
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#E2E8F0";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label style={labelStyle}>
-                Trường THCS đang học <span style={{ color: "#DC2626" }}>*</span>
-              </label>
-              <FieldWrapper icon={<School size={16} color="#9CA3AF" />} error={errors.school} errorStyle={errorStyle}>
-                <input
-                  type="text"
-                  style={{ ...inputStyle, borderColor: errors.school ? "#DC2626" : "#E2E8F0" }}
-                  placeholder="Trường THCS ..."
-                  value={form.school}
-                  onChange={(e) => setForm({ ...form, school: e.target.value })}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#2563EB";
-                    e.currentTarget.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = errors.school ? "#DC2626" : "#E2E8F0";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                />
-              </FieldWrapper>
-            </div>
-
             <div>
               <label style={labelStyle}>
                 Môn chuyên đăng ký <span style={{ color: "#DC2626" }}>*</span>
@@ -484,6 +512,27 @@ export function RegistrationForm() {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+
+            <div className="flex items-center justify-between gap-3">
+              <span style={{ ...labelStyle, marginBottom: 0 }}>Lệ phí dự thi:</span>
+              <div className="flex items-baseline justify-end gap-1 shrink-0 text-right">
+                <span style={{ display: "inline-flex", alignItems: "baseline", gap: 2 }}>
+                  <span
+                    style={{
+                      color: "#F97316",
+                      fontWeight: 700,
+                      fontSize: 22,
+                      lineHeight: 1.1,
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
+                    240.000
+                  </span>
+                  <span style={{ color: "#F97316", fontWeight: 700, fontSize: 13, lineHeight: 1 }}>đ</span>
+                </span>
+                <span style={{ color: "#6B7280", fontWeight: 400, fontSize: 13 }}>/ thí sinh</span>
+              </div>
             </div>
 
             <button
